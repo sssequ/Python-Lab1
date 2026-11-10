@@ -23,3 +23,4 @@ class Chat:
         self.id = None
         self.name = name
         self.user_ids = [creator_id]
+

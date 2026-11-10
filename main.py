@@ -13,6 +13,7 @@ MENU = """
 7. показать сообщения
 8. изменить сообщение
 9. удалить сообщение
+10. отправить личное сообщение
 0. выйти из программы
 """
 
@@ -100,6 +101,13 @@ def main():
                 user_id = read_id("id отправителя: ")
                 service.delete_message(message_id, user_id)
                 print("сообщение удалено")
+
+            elif choice == "10":
+                sender_id = read_id("id отправителя: ")
+                reciever_id = read_id("id получателя: ")
+                text = input("сообщение: ")
+                message = service.send_direct_message(sender_id, reciever_id, text)
+                print(f"сообщение отправлено. id: {message.id}")
 
             else:
                 print("такого действия нет, выберите пункт меню")

@@ -1,7 +1,6 @@
 from data_layer import User, Message, Chat
 from repository_layer import Repository
 
-
 # проверяет обязательные текстовые поля
 def check_text(text, field):
     if not isinstance(text, str):
@@ -64,6 +63,28 @@ class MessengerService:
         self._check_member(chat_id, sender_id)
         check_text(text, "сообщение")
         return self.messages.add(Message(sender_id, chat_id, text))
+
+    def get_or_create_chat_between_users(self, first_user_id, second_user_id):
+        first_user = self.users.get(first_user_id)
+        second_user = self.users.get(second_user_id)
+
+        chat = self.chats.find_chat_between_users(first_user_id, second_user_id)
+        if chat is not None:
+            return chat
+
+        chat = self.chats.add(Chat(f"first_user_id, second_user_id", first_user_id))
+        chat.user_ids.append(second_user_id)
+        return chat
+
+    def send_direct_message(self, sender_id, receiver_id, text):
+        self.users.get(sender_id)
+        self.users.get(receiver_id)
+        if sender_id == receiver_id:
+            raise ValueError("нельзя отправить сообщение самому себе")
+
+        check_text(text, "сообщение")
+        chat = self.get_or_create_chat_between_users(sender_id, receiver_id)
+        return self.send_message(chat.id, sender_id, text)
 
     # возвращает историю сообщений выбранного чата
     def read_messages(self, chat_id, user_id):

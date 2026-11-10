@@ -51,6 +51,12 @@ class MemoryRepository(Repository):
     def get_all(self):
         return list(self._items.values())
 
+    def find_chat_between_users(self, first_user_id, second_user_id):
+        for chat in self._items.values():
+            if set(chat.user_ids) == {first_user_id, second_user_id}:
+                return chat
+        return None
+
     # заменяет сохранённый объект
     def update(self, item):
         self.get(item.id)
