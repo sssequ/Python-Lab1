@@ -1,4 +1,7 @@
-from repository_layer import MemoryRepository
+from pathlib import Path
+
+from data_layer import User, Chat, Message
+from repository_layer import JsonRepository
 from service_layer import MessengerService
 
 
@@ -31,8 +34,11 @@ def read_id(prompt):
 
 def main():
     # для каждого вида сущностей используется отдельный репозиторий
+    data_path = Path(__file__).resolve().parent
     service = MessengerService(
-        MemoryRepository(), MemoryRepository(), MemoryRepository()
+        JsonRepository(data_path / "users.json", User),
+        JsonRepository(data_path / "chats.json", Chat),
+        JsonRepository(data_path / "messages.json", Message)
     )
 
     while True:

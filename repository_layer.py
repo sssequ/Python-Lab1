@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import json
+from pathlib import Path
 
 
 # слой репозитория: общий набор операций для любого хранилища
@@ -67,3 +69,38 @@ class MemoryRepository(Repository):
     def delete(self, item_id):
         self.get(item_id)
         del self._items[item_id]
+
+
+# хранит сущности в json и загружает их при запуске
+class JsonRepository(MemoryRepository):
+    def __init__(self, filename, item_type):
+        super().__init__()
+        self.filename = Path(filename)
+        if self.filename.exists():
+            with self.filename.open(encoding="utf-8") as file:
+                data = json.load(file)
+            self._next_id = data["next_id"]
+            for values in data["items"]:
+                item = item_type.__new__(item_type)
+                item.__dict__.update(values)
+                self._items[item.id] = item
+
+    def _save(self):
+        data = {"next_id": self._next_id,
+                "items": [item.__dict__ for item in self._items.values()]}
+        with self.filename.open("w", encoding="utf-8") as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+
+    def add(self, item):
+        item = super().add(item)
+        self._save()
+        return item
+
+    def update(self, item):
+        item = super().update(item)
+        self._save()
+        return item
+
+    def delete(self, item_id):
+        super().delete(item_id)
+        self._save()

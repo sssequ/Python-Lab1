@@ -74,6 +74,7 @@ class MessengerService:
 
         chat = self.chats.add(Chat(f"first_user_id, second_user_id", first_user_id))
         chat.user_ids.append(second_user_id)
+        self.chats.update(chat)
         return chat
 
     def send_direct_message(self, sender_id, receiver_id, text):
